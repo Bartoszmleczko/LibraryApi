@@ -1,5 +1,7 @@
 package pl.mleczkobartosz.LibraryApi.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +21,9 @@ public class Book {
     @Column(name="is_borrowed")
     private boolean isBorrowed;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.DETACH,CascadeType.MERGE,CascadeType.PERSIST,CascadeType.REFRESH})
     @JoinColumn
+    @JsonBackReference
     private Author author;
 
     public Book() {

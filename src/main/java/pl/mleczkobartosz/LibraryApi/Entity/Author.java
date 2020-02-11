@@ -19,7 +19,7 @@ public class Author {
     @Column(name = "birth_year")
     private int birthYear;
 
-    @OneToMany(mappedBy = "author")
+    @OneToMany(mappedBy = "author",cascade = CascadeType.ALL)
     private List<Book> books = new ArrayList<>();
 
     public Author() {
@@ -29,6 +29,10 @@ public class Author {
         this.firstName = firstName;
         this.lastName = lastName;
         this.birthYear = birthYear;
+    }
+
+    public Long getAuthor_id() {
+        return author_id;
     }
 
     public String getFirstName() {
@@ -54,6 +58,22 @@ public class Author {
         }
 
         books.add(book);
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setBirthYear(int birthYear) {
+        this.birthYear = birthYear;
+    }
+
+    public void setBooks(List<Book> books) {
+        this.books = books;
     }
 
     public void removeBook(Book book){
