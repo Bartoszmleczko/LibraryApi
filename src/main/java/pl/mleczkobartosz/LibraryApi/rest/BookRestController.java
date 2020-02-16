@@ -1,5 +1,9 @@
 package pl.mleczkobartosz.LibraryApi.rest;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 import pl.mleczkobartosz.LibraryApi.Entity.Author;
 import pl.mleczkobartosz.LibraryApi.Entity.Book;
@@ -23,43 +27,29 @@ private final AuthorRepository authorRepository;
     }
 
     @GetMapping("/books")
-    public List<Book> getAll(@RequestParam(value = "title", required = false) String title){
+    public Page<Book> getAll(@RequestParam(value = "title", required = false) String title, Pageable pageable){
 
         if(title!=null&&!title.trim().isEmpty()){
-            List<Book> book = bookRepository.findBookByTitle(title);
+            Page<Book> book = bookRepository.findBookByTitle(title,pageable);
             return book;
         }
 
-        return bookRepository.findAll();
+
+            return bookRepository.findAll(pageable);
     }
 
     @GetMapping("/books/{id}")
-    public Book findBookById(Long id){
-        Optional<Book> response = bookRepository.findById(id);
-        Book book = new Book();
-        if(response.isPresent()){
-            book = response.get();
-        }
-        else{
-            throw new BookNotFoundException(id);
-        }
+    public Book findBookById( @PathVariable Long id){
+        Book book = bookRepository.findById(id).orElseThrow( () -> new  BookNotFoundException(id)) ;
         return book;
     }
 
     @PostMapping("/books")
     public boolean saveBook(@RequestBody Book book){
+        Author author = authorRepository.findById(book.getAuthor().getAuthor_id())
+                .orElseThrow(()-> new AuthorNotFoundException(book.getAuthor().getAuthor_id()));
 
-        Optional<Author> optional = authorRepository.findById(book.getAuthor().getAuthor_id());
-        Author newAuthor = new Author();
-        if(optional.isPresent())
-        {
-            newAuthor = optional.get();
-        }
-        else{
-            throw new AuthorNotFoundException(book.getAuthor().getAuthor_id());
-        }
-        book.setAuthor(newAuthor);
-
+        book.setAuthor(author);
         bookRepository.save(book);
 
         return true;
@@ -68,12 +58,7 @@ private final AuthorRepository authorRepository;
     @PutMapping("/books/{id}")
     public boolean updateBook(@RequestBody Book book, @PathVariable Long id){
 
-        Optional<Book> response = bookRepository.findById(id);
-        Book newBook = new Book();
-
-        if(response.isPresent())
-        newBook = response.get();
-        else throw new BookNotFoundException(id);
+        Book newBook = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
 
         newBook.setTitle(book.getTitle());
         newBook.setBorrowed(book.isBorrowed());
@@ -84,12 +69,8 @@ private final AuthorRepository authorRepository;
 
     @DeleteMapping("/books/{id}")
     public boolean deleteBook(@PathVariable Long id){
-        Optional<Book> response = bookRepository.findById(id);
-        Book newBook = new Book();
 
-        if(response.isPresent())
-            newBook = response.get();
-        else throw new BookNotFoundException(id);
+        Book newBook = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
 
         bookRepository.delete(newBook);
         return true;

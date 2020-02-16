@@ -1,5 +1,8 @@
 package pl.mleczkobartosz.LibraryApi.rest;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 import pl.mleczkobartosz.LibraryApi.Entity.Author;
 import pl.mleczkobartosz.LibraryApi.exceptions.AuthorNotFoundException;
@@ -20,23 +23,18 @@ public class AuthorRestController {
 
 
     @GetMapping("/authors")
-    public List<Author> getAllAuthors(@RequestParam(value = "firstName",required = false) String firstName, @RequestParam(value = "lastName",required = false) String lastName){
+    public Page<Author> getAllAuthors(@RequestParam(value = "firstName",required = false) String firstName, @RequestParam(value = "lastName",required = false) String lastName, Pageable pageable){
         if(firstName!=null && lastName !=null)
-        return authorRepository.findAuthorsByFirstNameAndLastName(firstName,lastName);
+        return authorRepository.findAuthorsByFirstNameAndLastName(firstName,lastName,pageable);
 
-        return authorRepository.findAll();
+        return authorRepository.findAll(pageable);
     }
 
     @GetMapping("/authors/{id}")
     public Author findById(@PathVariable Long id){
-        Optional<Author> optional = authorRepository.findById(id);
-        Author author = new Author();
-        if(optional.isPresent())
-        {
-            author = optional.get();
-        }else{
-            throw new AuthorNotFoundException(id);
-        }
+
+        Author author = authorRepository.findById(id).orElseThrow(() -> new AuthorNotFoundException(id));
+
         return author;
     }
 
@@ -47,17 +45,9 @@ public class AuthorRestController {
     }
 
     @PutMapping("/authors/{id}")
-    public boolean update(@RequestBody Author author,@PathVariable Long id){
+    public boolean update(@RequestBody Author author, @PathVariable Long id){
 
-        Optional<Author> optional = authorRepository.findById(id);
-        Author newAuthor = new Author();
-        if(optional.isPresent())
-        {
-            newAuthor = optional.get();
-        }
-        else{
-            throw new AuthorNotFoundException(id);
-        }
+        Author newAuthor = authorRepository.findById(id).orElseThrow(() -> new AuthorNotFoundException(id));
         newAuthor.setFirstName(author.getFirstName());
         newAuthor.setLastName(author.getLastName());
         newAuthor.setBirthYear(author.getBirthYear());
@@ -68,17 +58,9 @@ public class AuthorRestController {
     @DeleteMapping("/authors/{id}")
     public boolean delete(@PathVariable Long id){
 
-        Optional<Author> optional = authorRepository.findById(id);
-        Author newAuthor = new Author();
-        if(optional.isPresent())
-        {
-            newAuthor = optional.get();
-        }
-        else{
-            throw new AuthorNotFoundException(id);
-        }
+        Author author = authorRepository.findById(id).orElseThrow(() -> new AuthorNotFoundException(id));
 
-        authorRepository.delete(newAuthor);
+        authorRepository.delete(author);
         return true;
     }
 
