@@ -1,9 +1,7 @@
 package pl.mleczkobartosz.LibraryApi.rest;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 import pl.mleczkobartosz.LibraryApi.Entity.Author;
 import pl.mleczkobartosz.LibraryApi.Entity.Book;
@@ -12,7 +10,6 @@ import pl.mleczkobartosz.LibraryApi.exceptions.BookNotFoundException;
 import pl.mleczkobartosz.LibraryApi.repository.AuthorRepository;
 import pl.mleczkobartosz.LibraryApi.repository.BookRepository;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -27,15 +24,9 @@ private final AuthorRepository authorRepository;
     }
 
     @GetMapping("/books")
-    public Page<Book> getAll(@RequestParam(value = "title", required = false) String title, Pageable pageable){
+    public Page<Book> getAll(@RequestParam Optional<String> title, Pageable pageable){
 
-        if(title!=null&&!title.trim().isEmpty()){
-            Page<Book> book = bookRepository.findBookByTitle(title,pageable);
-            return book;
-        }
-
-
-            return bookRepository.findAll(pageable);
+            return bookRepository.findBookByTitle(title.orElse("_"),pageable);
     }
 
     @GetMapping("/books/{id}")

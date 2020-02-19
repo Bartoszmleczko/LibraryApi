@@ -1,10 +1,9 @@
 package pl.mleczkobartosz.LibraryApi.Entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import pl.mleczkobartosz.LibraryApi.Entity.Author;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name="book")

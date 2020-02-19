@@ -2,13 +2,11 @@ package pl.mleczkobartosz.LibraryApi.rest;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 import pl.mleczkobartosz.LibraryApi.Entity.Author;
 import pl.mleczkobartosz.LibraryApi.exceptions.AuthorNotFoundException;
 import pl.mleczkobartosz.LibraryApi.repository.AuthorRepository;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -23,11 +21,13 @@ public class AuthorRestController {
 
 
     @GetMapping("/authors")
-    public Page<Author> getAllAuthors(@RequestParam(value = "firstName",required = false) String firstName, @RequestParam(value = "lastName",required = false) String lastName, Pageable pageable){
-        if(firstName!=null && lastName !=null)
-        return authorRepository.findAuthorsByFirstNameAndLastName(firstName,lastName,pageable);
+    public Page<Author> getAllAuthors(@RequestParam Optional<String> firstName, @RequestParam Optional<String> lastName,@RequestParam Optional<Integer> birthYear, Pageable pageable){
 
-        return authorRepository.findAll(pageable);
+        if(!birthYear.isPresent())
+            return authorRepository.findAuthorsByFirstNameAndLastName(firstName.orElse("_"), lastName.orElse("_"), pageable);
+
+            Integer year = birthYear.get();
+            return authorRepository.findAuthorsByFirstNameAndLastNameAndBirthYear(firstName.orElse("_"), lastName.orElse("_"),year, pageable);
     }
 
     @GetMapping("/authors/{id}")
