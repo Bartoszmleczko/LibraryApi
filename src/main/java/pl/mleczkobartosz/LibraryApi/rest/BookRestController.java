@@ -26,7 +26,9 @@ private final AuthorRepository authorRepository;
     @GetMapping("/books")
     public Page<Book> getAll(@RequestParam Optional<String> title, Pageable pageable){
 
-            return bookRepository.findBookByTitle(title.orElse("_"),pageable);
+
+                return bookRepository.findBookByTitle(title.orElse("_"), pageable);
+
     }
 
     @GetMapping("/books/{id}")

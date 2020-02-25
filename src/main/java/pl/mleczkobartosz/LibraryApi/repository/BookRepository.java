@@ -9,8 +9,9 @@ import pl.mleczkobartosz.LibraryApi.Entity.Book;
 
 public interface BookRepository extends JpaRepository<Book,Long>, JpaSpecificationExecutor<Book> {
 
-
     @Query("select b from Book b where title like %?1%")
     public Page<Book> findBookByTitle(String title, Pageable pageable);
+
+
 
 }
