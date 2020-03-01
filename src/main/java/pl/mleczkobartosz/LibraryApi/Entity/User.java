@@ -1,6 +1,7 @@
 package pl.mleczkobartosz.LibraryApi.Entity;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -27,9 +28,13 @@ public class User {
     @Column(name = "email")
     private String email;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = {CascadeType.DETACH,CascadeType.MERGE,CascadeType.PERSIST,CascadeType.REFRESH})
     @JoinTable(name="user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name="role_id"))
     private Set<Role> role;
+
+    @ManyToMany(cascade = {CascadeType.DETACH,CascadeType.MERGE,CascadeType.PERSIST,CascadeType.REFRESH})
+    @JoinTable(name="user_book", joinColumns = @JoinColumn(name = "user_id"),inverseJoinColumns = @JoinColumn(name="id"))
+    private Set<Book> book = new HashSet<Book>();
 
     public User() {
     }
@@ -40,13 +45,12 @@ public class User {
         this.firstName = firstName;
         this.lastName = lastName;
         this.role = role;
+
     }
 
     public Long getUser_id() {
         return user_id;
     }
-
-
 
     public String getUsername() {
         return username;
@@ -86,5 +90,21 @@ public class User {
 
     public void setRole(Set<Role> role) {
         this.role = role;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Set<Book> getBook() {
+        return book;
+    }
+
+    public void setBook(Set<Book> book) {
+        this.book = book;
     }
 }

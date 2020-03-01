@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import pl.mleczkobartosz.LibraryApi.service.CustomUserDetailService;
 
@@ -29,9 +30,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().antMatchers("/books/**").permitAll()
-                .antMatchers("/register").permitAll()
-                .antMatchers("/authors/**").hasAuthority("USER").anyRequest().authenticated().and().formLogin();
+        http.authorizeRequests().antMatchers("/register").permitAll()
+                .antMatchers("/authors/**","/books/**","/users/**").hasAuthority("USER")
+                .and().csrf().disable().
+                httpBasic()
+                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
     @Bean
