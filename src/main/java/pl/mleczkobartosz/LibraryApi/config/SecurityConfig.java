@@ -3,6 +3,7 @@ package pl.mleczkobartosz.LibraryApi.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -31,7 +32,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests().antMatchers("/register").permitAll()
-                .antMatchers("/authors/**","/books/**","/users/**").hasAuthority("USER")
+                .antMatchers(HttpMethod.GET,"/authors/**").hasAuthority("USER")
+                .antMatchers(HttpMethod.GET,"/books/**").hasAuthority("USER")
+                .antMatchers(HttpMethod.POST,"/authors/**").hasAuthority("ADMIN")
+                .antMatchers(HttpMethod.PUT,"/authors/**").hasAuthority("ADMIN")
+                .antMatchers(HttpMethod.DELETE,"/authors/**").hasAuthority("ADMIN")
+                .antMatchers(HttpMethod.POST,"/books/**").hasAuthority("ADMIN")
+                .antMatchers(HttpMethod.PUT,"/books/**").hasAuthority("ADMIN")
+                .antMatchers(HttpMethod.DELETE,"/books/**").hasAuthority("ADMIN")
+                .antMatchers("/users/**").hasAuthority("ADMIN")
                 .and().csrf().disable().
                 httpBasic()
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

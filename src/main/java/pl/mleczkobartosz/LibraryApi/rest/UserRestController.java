@@ -2,28 +2,30 @@ package pl.mleczkobartosz.LibraryApi.rest;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import pl.mleczkobartosz.LibraryApi.Entity.Book;
+import pl.mleczkobartosz.LibraryApi.Entity.Role;
 import pl.mleczkobartosz.LibraryApi.Entity.User;
 import pl.mleczkobartosz.LibraryApi.exceptions.BookNotFoundException;
 import pl.mleczkobartosz.LibraryApi.exceptions.UserNotFoundException;
 import pl.mleczkobartosz.LibraryApi.repository.BookRepository;
+import pl.mleczkobartosz.LibraryApi.repository.RoleRepository;
 import pl.mleczkobartosz.LibraryApi.repository.UserRepository;
 
 import java.util.Optional;
 
 
 @RestController
-public class UserController  {
+public class UserRestController {
 
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
+    private final RoleRepository roleRepository;
 
-    public UserController(UserRepository userRepository, BookRepository bookRepository) {
+    public UserRestController(UserRepository userRepository, BookRepository bookRepository, RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.bookRepository = bookRepository;
+        this.roleRepository = roleRepository;
     }
 
     @GetMapping("/users")
@@ -32,7 +34,7 @@ public class UserController  {
     }
 
     @GetMapping("/users/{id}")
-    public User findById(@RequestParam Long id){
+    public User findById(@PathVariable Long id){
         return userRepository.findById(id).orElseThrow(() ->new UserNotFoundException(id));
     }
 
@@ -75,6 +77,36 @@ public class UserController  {
         }
 
         return userRepository.save(user);
+    }
+
+
+    @PutMapping("/users/{userId}/grant")
+    public String grantAdminRole(@PathVariable Long userId){
+
+        User user = userRepository.findById(userId).orElseThrow(() ->new UserNotFoundException(userId));
+        Role role = roleRepository.findByName("ADMIN");
+
+        user.getRole().add(role);
+        userRepository.save(user);
+
+
+        return "Granted admin role";
+    }
+
+    @PutMapping("/users/{userId}/degrade")
+    public String takeAdminAccess(@PathVariable Long  userId){
+
+        User user = userRepository.findById(userId).orElseThrow(() ->new UserNotFoundException(userId));
+        Role role = roleRepository.findByName("ADMIN");
+
+        if(!user.getRole().contains(role))
+            return "This user has no admin role";
+
+        user.getRole().remove(role);
+        userRepository.save(user);
+
+        return "Taken admin role";
+
     }
 
 

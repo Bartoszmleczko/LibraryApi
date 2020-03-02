@@ -7,6 +7,7 @@ import pl.mleczkobartosz.LibraryApi.Entity.Author;
 import pl.mleczkobartosz.LibraryApi.exceptions.AuthorNotFoundException;
 import pl.mleczkobartosz.LibraryApi.repository.AuthorRepository;
 
+import javax.validation.Valid;
 import java.util.Optional;
 
 @RestController
@@ -39,13 +40,13 @@ public class AuthorRestController {
     }
 
     @PostMapping("/authors")
-    public boolean saveAuthor(@RequestBody Author author){
+    public boolean saveAuthor(@Valid @RequestBody Author author){
         authorRepository.save(author);
         return true;
     }
 
     @PutMapping("/authors/{id}")
-    public boolean update(@RequestBody Author author, @PathVariable Long id){
+    public boolean update(@Valid @RequestBody Author author, @PathVariable Long id){
 
         Author newAuthor = authorRepository.findById(id).orElseThrow(() -> new AuthorNotFoundException(id));
         newAuthor.setFirstName(author.getFirstName());

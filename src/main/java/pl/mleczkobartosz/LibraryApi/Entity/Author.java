@@ -1,6 +1,9 @@
 package pl.mleczkobartosz.LibraryApi.Entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.*;
 
 @Entity
@@ -12,10 +15,18 @@ public class Author {
     @Column(name = "author_id")
     private Long author_id;
 
+    @NotNull(message = "This field must be filled")
+    @NotEmpty(message = "This field must be filled")
+    @Size(min = 2)
     @Column(name = "first_name")
     private String firstName;
+
+    @Size(min = 2)
+    @NotNull(message = "This field must be filled")
+    @NotEmpty(message = "This field must be filled")
     @Column(name = "last_name")
     private String lastName;
+    @NotNull(message = "This field must be filled")
     @Column(name = "birth_year")
     private int birthYear;
 
