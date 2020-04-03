@@ -6,8 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.mleczkobartosz.LibraryApi.Entity.Book;
 import pl.mleczkobartosz.LibraryApi.Entity.Role;
 import pl.mleczkobartosz.LibraryApi.Entity.User;
-import pl.mleczkobartosz.LibraryApi.exceptions.BookNotFoundException;
-import pl.mleczkobartosz.LibraryApi.exceptions.UserNotFoundException;
+import pl.mleczkobartosz.LibraryApi.exceptions.CustomNotFoundException;
 import pl.mleczkobartosz.LibraryApi.repository.BookRepository;
 import pl.mleczkobartosz.LibraryApi.repository.RoleRepository;
 import pl.mleczkobartosz.LibraryApi.repository.UserRepository;
@@ -35,13 +34,13 @@ public class UserRestController {
 
     @GetMapping("/users/{id}")
     public User findById(@PathVariable Long id){
-        return userRepository.findById(id).orElseThrow(() ->new UserNotFoundException(id));
+        return userRepository.findById(id).orElseThrow(() ->new CustomNotFoundException(User.class.getSimpleName(),id));
     }
 
     @PutMapping("/users/{id}")
     public User updateUser(@RequestParam Long id, @RequestBody User user){
 
-        User dbUser = userRepository.findById(id).orElseThrow(()->new UserNotFoundException(id));
+        User dbUser = userRepository.findById(id).orElseThrow(()->new CustomNotFoundException(User.class.getSimpleName(),id));
 
         dbUser.setFirstName(user.getFirstName());
         dbUser.setLastName(user.getLastName());
@@ -50,15 +49,15 @@ public class UserRestController {
 
     @DeleteMapping("/users/{id}")
     public void deleteUser(@RequestParam Long id){
-        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+        User user = userRepository.findById(id).orElseThrow(() ->new CustomNotFoundException(User.class.getSimpleName(),id));
         userRepository.delete(user);
     }
 
     @PutMapping("/users/{userId}/borrow")
     public User borrowBook(@PathVariable Long userId,@RequestBody Book bookId){
 
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-        Book book = bookRepository.findById(bookId.getId()).orElseThrow(() -> new BookNotFoundException(bookId.getId()));
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomNotFoundException(User.class.getSimpleName(),userId));
+        Book book = bookRepository.findById(bookId.getId()).orElseThrow(() -> new CustomNotFoundException(Book.class.getSimpleName(),bookId.getId()));
 
         book.setBorrowed(true);
         user.getBook().add(book);
@@ -68,8 +67,8 @@ public class UserRestController {
     @PutMapping("/users/{userId}/return")
     public User returnBook(@PathVariable Long userId,@RequestBody Book bookId){
 
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-        Book book = bookRepository.findById(bookId.getId()).orElseThrow(() -> new BookNotFoundException(bookId.getId()));
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomNotFoundException(User.class.getSimpleName(),userId));
+        Book book = bookRepository.findById(bookId.getId()).orElseThrow(() -> new CustomNotFoundException(Book.class.getSimpleName(),bookId.getId()));
         if(user.getBook().contains(book)){
             user.getBook().remove(book);
             book.setBorrowed(false);
@@ -83,7 +82,7 @@ public class UserRestController {
     @PutMapping("/users/{userId}/grant")
     public String grantAdminRole(@PathVariable Long userId){
 
-        User user = userRepository.findById(userId).orElseThrow(() ->new UserNotFoundException(userId));
+        User user = userRepository.findById(userId).orElseThrow(() ->new CustomNotFoundException(User.class.getSimpleName(),userId));
         Role role = roleRepository.findByName("ADMIN");
 
         user.getRole().add(role);
@@ -96,7 +95,7 @@ public class UserRestController {
     @PutMapping("/users/{userId}/degrade")
     public String takeAdminAccess(@PathVariable Long  userId){
 
-        User user = userRepository.findById(userId).orElseThrow(() ->new UserNotFoundException(userId));
+        User user = userRepository.findById(userId).orElseThrow(() ->new CustomNotFoundException(User.class.getSimpleName(),userId));
         Role role = roleRepository.findByName("ADMIN");
 
         if(!user.getRole().contains(role))

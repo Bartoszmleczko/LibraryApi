@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.mleczkobartosz.LibraryApi.Entity.User;
 import pl.mleczkobartosz.LibraryApi.service.UserService;
 
+import javax.validation.Valid;
+
 @RestController
 public class RegisterController {
 
@@ -16,7 +18,7 @@ public class RegisterController {
     }
 
     @PostMapping("/register")
-    public User register(@RequestBody User user){
+    public User register(@Valid @RequestBody User user){
         return userService.saveUser(user);
     }
 

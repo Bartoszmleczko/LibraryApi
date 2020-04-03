@@ -4,7 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import pl.mleczkobartosz.LibraryApi.Entity.Author;
-import pl.mleczkobartosz.LibraryApi.exceptions.AuthorNotFoundException;
+import pl.mleczkobartosz.LibraryApi.exceptions.CustomNotFoundException;
 import pl.mleczkobartosz.LibraryApi.repository.AuthorRepository;
 
 import javax.validation.Valid;
@@ -34,7 +34,7 @@ public class AuthorRestController {
     @GetMapping("/authors/{id}")
     public Author findById(@PathVariable Long id){
 
-        Author author = authorRepository.findById(id).orElseThrow(() -> new AuthorNotFoundException(id));
+        Author author = authorRepository.findById(id).orElseThrow(() -> new CustomNotFoundException(Author.class.getSimpleName(),id));
 
         return author;
     }
@@ -48,7 +48,7 @@ public class AuthorRestController {
     @PutMapping("/authors/{id}")
     public boolean update(@Valid @RequestBody Author author, @PathVariable Long id){
 
-        Author newAuthor = authorRepository.findById(id).orElseThrow(() -> new AuthorNotFoundException(id));
+        Author newAuthor = authorRepository.findById(id).orElseThrow(() -> new CustomNotFoundException(Author.class.getSimpleName(),id));
         newAuthor.setFirstName(author.getFirstName());
         newAuthor.setLastName(author.getLastName());
         newAuthor.setBirthYear(author.getBirthYear());
@@ -59,7 +59,7 @@ public class AuthorRestController {
     @DeleteMapping("/authors/{id}")
     public boolean delete(@PathVariable Long id){
 
-        Author author = authorRepository.findById(id).orElseThrow(() -> new AuthorNotFoundException(id));
+        Author author = authorRepository.findById(id).orElseThrow(() -> new CustomNotFoundException(Author.class.getSimpleName(),id));
 
         authorRepository.delete(author);
         return true;
